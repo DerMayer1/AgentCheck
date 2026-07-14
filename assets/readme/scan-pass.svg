@@ -1,0 +1,32 @@
+<svg width="1200" height="690" viewBox="0 0 1200 690" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">AgentCheck successful scan</title>
+  <desc id="desc">Real terminal output from the coherent repository fixture, scoring 100 out of 100.</desc>
+  <rect width="1200" height="690" rx="24" fill="#090D14"/>
+  <rect width="1200" height="54" rx="24" fill="#111824"/>
+  <rect y="30" width="1200" height="24" fill="#111824"/>
+  <circle cx="28" cy="27" r="7" fill="#FF6B6B"/><circle cx="52" cy="27" r="7" fill="#FFD166"/><circle cx="76" cy="27" r="7" fill="#55D6BE"/>
+  <text x="600" y="33" text-anchor="middle" fill="#6F7C8D" font-family="Inter,Segoe UI,sans-serif" font-size="13">agentcheck — coherent fixture</text>
+  <g font-family="Consolas,Menlo,monospace" font-size="20">
+    <text x="42" y="91" fill="#6D7A89">$</text><text x="68" y="91" fill="#E7ECEA">agentcheck scan tests/fixtures/coherent</text>
+    <text x="42" y="139" fill="#F4F7F3" font-weight="700">AgentCheck 0.1.0</text>
+    <text x="42" y="190" fill="#718091">Repository</text><text x="190" y="190" fill="#E7ECEA">coherent</text>
+    <text x="42" y="224" fill="#718091">Files</text><text x="190" y="224" fill="#E7ECEA">7</text>
+    <text x="42" y="258" fill="#718091">Size</text><text x="190" y="258" fill="#E7ECEA">761 B</text>
+    <text x="42" y="318" fill="#B9F56A" font-weight="700">AGENT READINESS  100/100</text>
+    <text x="42" y="365" fill="#96A4A5">Verification</text><text x="260" y="365" fill="#B9F56A">100/100</text>
+    <text x="42" y="399" fill="#96A4A5">Environment</text><text x="260" y="399" fill="#B9F56A">100/100</text>
+    <text x="42" y="433" fill="#96A4A5">Safety</text><text x="260" y="433" fill="#B9F56A">100/100</text>
+    <text x="42" y="467" fill="#96A4A5">Context</text><text x="260" y="467" fill="#B9F56A">100/100</text>
+    <text x="42" y="501" fill="#96A4A5">Integrity</text><text x="260" y="501" fill="#B9F56A">100/100</text>
+    <text x="42" y="563" fill="#B9F56A">14 passed</text><text x="165" y="563" fill="#596879">·</text><text x="190" y="563" fill="#B9F56A">0 findings</text>
+    <text x="42" y="622" fill="#596879">Completed in 50ms</text>
+  </g>
+  <g transform="translate(705 175)">
+    <circle cx="165" cy="165" r="131" fill="none" stroke="#1B2632" stroke-width="22"/>
+    <circle cx="165" cy="165" r="131" fill="none" stroke="#B9F56A" stroke-width="22" stroke-linecap="round" stroke-dasharray="823 823" transform="rotate(-90 165 165)"/>
+    <text x="165" y="157" text-anchor="middle" fill="#F4F7F3" font-family="Inter,Segoe UI,sans-serif" font-size="74" font-weight="760">100</text>
+    <text x="165" y="193" text-anchor="middle" fill="#738184" font-family="Inter,Segoe UI,sans-serif" font-size="18">READY</text>
+    <rect x="74" y="343" width="182" height="38" rx="19" fill="#B9F56A" fill-opacity=".1" stroke="#B9F56A" stroke-opacity=".3"/>
+    <text x="165" y="367" text-anchor="middle" fill="#B9F56A" font-family="Inter,Segoe UI,sans-serif" font-size="14" font-weight="650">NO BLOCKING FINDINGS</text>
+  </g>
+</svg>

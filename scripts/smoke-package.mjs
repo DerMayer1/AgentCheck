@@ -12,10 +12,17 @@ const tarball = path.join(root, manifest.filename);
 const sandbox = await mkdtemp(path.join(tmpdir(), "agentcheck-package-"));
 
 try {
-  const allowedRoots = new Set(["LICENSE", "README.md", "dist", "package.json", "schemas"]);
+  const allowedRoots = new Set(["LICENSE", "README.md", "assets", "dist", "package.json", "schemas"]);
   const unexpected = manifest.files.map((file) => file.path.split("/")[0]).filter((entry) => !allowedRoots.has(entry));
   if (unexpected.length > 0) throw new Error(`Unexpected tarball entries: ${[...new Set(unexpected)].join(", ")}`);
-  for (const required of ["dist/cli/main.js", "schemas/config-v1.schema.json", "schemas/scan-result-v1.schema.json"]) {
+  for (const required of [
+    "assets/readme/hero.png",
+    "assets/readme/scan-pass.png",
+    "assets/readme/scan-findings.png",
+    "dist/cli/main.js",
+    "schemas/config-v1.schema.json",
+    "schemas/scan-result-v1.schema.json",
+  ]) {
     if (!manifest.files.some((file) => file.path === required)) throw new Error(`Tarball is missing ${required}`);
   }
 

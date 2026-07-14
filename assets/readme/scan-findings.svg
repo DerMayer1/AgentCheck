@@ -1,0 +1,32 @@
+<svg width="1200" height="790" viewBox="0 0 1200 790" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">AgentCheck evidence-backed findings</title>
+  <desc id="desc">Excerpt of real terminal output from the unsafe repository fixture, showing concrete evidence and remediation.</desc>
+  <rect width="1200" height="790" rx="24" fill="#090D14"/>
+  <rect width="1200" height="54" rx="24" fill="#111824"/><rect y="30" width="1200" height="24" fill="#111824"/>
+  <circle cx="28" cy="27" r="7" fill="#FF6B6B"/><circle cx="52" cy="27" r="7" fill="#FFD166"/><circle cx="76" cy="27" r="7" fill="#55D6BE"/>
+  <text x="600" y="33" text-anchor="middle" fill="#6F7C8D" font-family="Inter,Segoe UI,sans-serif" font-size="13">agentcheck — unsafe fixture · real output excerpt</text>
+  <g font-family="Consolas,Menlo,monospace" font-size="18">
+    <text x="42" y="91" fill="#6D7A89">$</text><text x="68" y="91" fill="#E7ECEA">agentcheck scan tests/fixtures/unsafe</text>
+    <text x="42" y="141" fill="#FF8585" font-weight="700">AGENT READINESS  50/100</text>
+    <text x="42" y="181" fill="#96A4A5">9 passed</text><text x="140" y="181" fill="#596879">·</text><text x="164" y="181" fill="#FF8585">8 findings</text>
+
+    <text x="42" y="239" fill="#FF8585">×</text><text x="72" y="239" fill="#F4F7F3" font-weight="700">AC-VER-006</text><text x="205" y="239" fill="#D3DADB">Validation failures are not suppressed</text>
+    <text x="72" y="272" fill="#859397">package.json: test script: vitest run || true</text>
+    <text x="72" y="305" fill="#B9F56A">Fix:</text><text x="123" y="305" fill="#AEB9B8">Remove unconditional success fallbacks.</text>
+
+    <line x1="42" y1="337" x2="1158" y2="337" stroke="#1E2935"/>
+    <text x="42" y="382" fill="#FF8585">×</text><text x="72" y="382" fill="#F4F7F3" font-weight="700">AC-ENV-004</text><text x="205" y="382" fill="#D3DADB">Required environment variables are documented</text>
+    <text x="72" y="415" fill="#859397">src/index.ts:1: SERVICE_TOKEN is not documented.</text>
+    <text x="72" y="448" fill="#B9F56A">Fix:</text><text x="123" y="448" fill="#AEB9B8">Add missing names to .env.example without secret values.</text>
+
+    <line x1="42" y1="480" x2="1158" y2="480" stroke="#1E2935"/>
+    <text x="42" y="525" fill="#FF8585">×</text><text x="72" y="525" fill="#F4F7F3" font-weight="700">AC-SAFE-001</text><text x="218" y="525" fill="#D3DADB">Production operations are separated from verification</text>
+    <text x="72" y="558" fill="#859397">package.json: npm run test &amp;&amp; npm run deploy</text>
+    <text x="72" y="591" fill="#B9F56A">Fix:</text><text x="123" y="591" fill="#AEB9B8">Keep deployment outside routine validation commands.</text>
+
+    <line x1="42" y1="623" x2="1158" y2="623" stroke="#1E2935"/>
+    <text x="42" y="668" fill="#FF8585">×</text><text x="72" y="668" fill="#F4F7F3" font-weight="700">AC-INT-002</text><text x="205" y="668" fill="#D3DADB">Referenced local paths exist</text>
+    <text x="72" y="701" fill="#859397">README.md:5: src/missing.ts</text>
+    <text x="72" y="734" fill="#B9F56A">Fix:</text><text x="123" y="734" fill="#AEB9B8">Correct stale paths or restore the referenced file.</text>
+  </g>
+</svg>

@@ -14,6 +14,7 @@
     "agentcheck": "./dist/cli/main.js"
   },
   "files": [
+    "assets/readme",
     "dist",
     "schemas",
     "README.md"
