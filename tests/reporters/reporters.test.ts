@@ -16,6 +16,8 @@ const result: ScanResult = {
   },
   profile: {
     ecosystems: [],
+    packageManagers: [],
+    workspace: false,
     fileCount: 2,
     totalBytes: 1_500,
   },
@@ -40,6 +42,6 @@ describe("reporters", () => {
     expect(rendered).toContain("AgentCheck 0.0.0");
     expect(rendered).toContain("fixture");
     expect(rendered).toContain("2");
-    expect(rendered).toContain("No readiness rules are installed");
+    expect(rendered).toContain("No applicable readiness rules were scored");
   });
 });

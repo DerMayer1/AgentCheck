@@ -8,6 +8,7 @@
   },
   "files": [
     "dist",
+    "schemas",
     "README.md"
   ],
   "scripts": {
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.19.8",
+    "ajv": "^8.17.1",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"

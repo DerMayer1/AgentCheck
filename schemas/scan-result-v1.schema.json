@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agentcheck.dev/schema/scan-result-v1.json",
+  "title": "AgentCheck scan result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "toolVersion",
+    "complete",
+    "repository",
+    "profile",
+    "findings",
+    "scores",
+    "limitations",
+    "durationMs"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1" },
+    "toolVersion": { "type": "string" },
+    "complete": { "type": "boolean" },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "root", "gitRepository"],
+      "properties": {
+        "name": { "type": "string" },
+        "root": { "type": "string" },
+        "gitRepository": { "type": "boolean" }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ecosystems", "packageManagers", "workspace", "fileCount", "totalBytes"],
+      "properties": {
+        "ecosystems": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "packageManagers": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "workspace": { "type": "boolean" },
+        "fileCount": { "type": "integer", "minimum": 0 },
+        "totalBytes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/finding" }
+    },
+    "scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["overall", "categories"],
+      "properties": {
+        "overall": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+        "categories": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/categoryScore" }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "message", "affectsCompleteness"],
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" },
+          "path": { "type": "string" },
+          "affectsCompleteness": { "type": "boolean" }
+        }
+      }
+    },
+    "durationMs": { "type": "integer", "minimum": 0 }
+  },
+  "definitions": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "message"],
+      "properties": {
+        "kind": { "enum": ["file", "manifest", "script", "workflow", "derived"] },
+        "path": { "type": "string" },
+        "line": { "type": "integer", "minimum": 1 },
+        "message": { "type": "string" }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ruleId", "category", "status", "severity", "confidence", "title", "impact", "evidence", "earnedPoints", "maxPoints"],
+      "properties": {
+        "ruleId": { "type": "string" },
+        "category": { "enum": ["verification", "environment", "safety", "context", "integrity"] },
+        "status": { "enum": ["pass", "fail", "warn", "skip", "error"] },
+        "severity": { "enum": ["critical", "high", "medium", "low", "info"] },
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "title": { "type": "string" },
+        "impact": { "type": "string" },
+        "recommendation": { "type": "string" },
+        "evidence": { "type": "array", "items": { "$ref": "#/definitions/evidence" } },
+        "earnedPoints": { "type": "number", "minimum": 0 },
+        "maxPoints": { "type": "number", "minimum": 0 }
+      }
+    },
+    "categoryScore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category", "weight", "score", "earnedPoints", "maxPoints"],
+      "properties": {
+        "category": { "enum": ["verification", "environment", "safety", "context", "integrity"] },
+        "weight": { "type": "number", "minimum": 0, "maximum": 1 },
+        "score": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+        "earnedPoints": { "type": "number", "minimum": 0 },
+        "maxPoints": { "type": "number", "minimum": 0 }
+      }
+    }
+  }
+}

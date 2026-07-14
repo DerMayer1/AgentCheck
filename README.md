@@ -48,7 +48,7 @@ npm run dev -- scan .
 
 ## Status
 
-Phase 1 walking skeleton. The CLI can traverse a repository safely and emit terminal or JSON metadata. Readiness detectors and rules are the next implementation phase.
+Phase 2 evidence slice. The CLI detects Node.js repositories, package managers, workspaces, package scripts, documented commands, and GitHub Actions commands. Six deterministic rules produce evidence-backed findings and a real score.
 
 See:
 

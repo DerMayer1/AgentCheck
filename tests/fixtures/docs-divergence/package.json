@@ -1,0 +1,11 @@
+{
+  "name": "docs-divergence-fixture",
+  "private": true,
+  "packageManager": "npm@10.9.4",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "verify": "npm run typecheck && npm test && npm run build"
+  }
+}

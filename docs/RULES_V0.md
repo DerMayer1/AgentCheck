@@ -2,6 +2,8 @@
 
 This catalog defines the initial rule-design surface. A rule only enters the runtime after its fixtures, evidence format, applicability behavior, and scoring points are specified.
 
+Runtime status: AC-ENV-001, AC-ENV-003, AC-VER-001, AC-VER-003, AC-VER-004, and AC-INT-001 are implemented in the Phase 2 evidence slice.
+
 ## Rule result requirements
 
 Every rule must provide:

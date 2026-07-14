@@ -281,10 +281,12 @@ Within a category:
 
 ```text
 category score = earned applicable points / maximum applicable points
-overall score = weighted sum of category scores
+overall score = weighted mean of applicable category scores
 ```
 
 Rules marked `skip` are not applicable. Rules marked `error` do not silently become failures; the scan records a limitation and CI may be configured to reject incomplete analysis.
+
+Weights are renormalized across categories with applicable points. A repository is not penalized because a category has no applicable rules in the installed rule set.
 
 Confidence does not numerically discount a result. A rule must have high or medium confidence to affect scoring; low-confidence results are advisory.
 

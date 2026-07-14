@@ -1,0 +1,11 @@
+{
+  "name": "workspace-fixture",
+  "private": true,
+  "packageManager": "npm@10.9.4",
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "test": "npm test --workspaces",
+    "verify": "npm test && npm run build",
+    "build": "npm run build --workspaces"
+  }
+}

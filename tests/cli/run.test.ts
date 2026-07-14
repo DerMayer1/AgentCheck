@@ -1,6 +1,7 @@
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -8,6 +9,10 @@ import { runCli } from "../../src/cli/run.js";
 import { EXIT_CODES } from "../../src/cli/exit-codes.js";
 
 const temporaryDirectories: string[] = [];
+const fixtureRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../fixtures",
+);
 
 afterEach(async () => {
   await Promise.all(
@@ -71,5 +76,19 @@ describe("runCli", () => {
 
     expect(exitCode).toBe(EXIT_CODES.INCOMPLETE_ANALYSIS);
     expect(stderr).toContain("cannot apply --min-score");
+  });
+
+  it("passes and fails score gates from real findings", async () => {
+    const passingCode = await runCli(
+      ["scan", path.join(fixtureRoot, "coherent"), "--ci", "--min-score", "100"],
+      { stdout: () => undefined, stderr: () => undefined },
+    );
+    const failingCode = await runCli(
+      ["scan", path.join(fixtureRoot, "ci-divergence"), "--ci", "--min-score", "100"],
+      { stdout: () => undefined, stderr: () => undefined },
+    );
+
+    expect(passingCode).toBe(EXIT_CODES.SUCCESS);
+    expect(failingCode).toBe(EXIT_CODES.POLICY_GATE_FAILED);
   });
 });

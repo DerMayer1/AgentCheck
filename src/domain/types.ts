@@ -40,6 +40,8 @@ export interface RepositoryIdentity {
 
 export interface RepositoryProfile {
   ecosystems: string[];
+  packageManagers: string[];
+  workspace: boolean;
   fileCount: number;
   totalBytes: number;
 }

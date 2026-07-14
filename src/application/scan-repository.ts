@@ -1,13 +1,15 @@
 import { access } from "node:fs/promises";
 import path from "node:path";
 
+import { detectFacts } from "../detectors/detect-facts.js";
 import type { ScanResult } from "../domain/types.js";
 import {
   DEFAULT_TRAVERSAL_LIMITS,
   readRepository,
   type TraversalLimits,
 } from "../repository/repository-reader.js";
-import { createEmptyScore } from "../scoring/empty-score.js";
+import { evaluateRules } from "../rules/evaluate-rules.js";
+import { calculateScore } from "../scoring/empty-score.js";
 
 export interface ScanRepositoryOptions {
   toolVersion: string;
@@ -32,11 +34,27 @@ export async function scanRepository(
     targetPath,
     options.limits ?? DEFAULT_TRAVERSAL_LIMITS,
   );
+  const facts = await detectFacts(snapshot);
+  const findings = evaluateRules(facts);
+  const factLimitations = facts.limitations.map((limitation) => ({
+    ...limitation,
+    affectsCompleteness: true,
+  }));
+  const limitations = [...snapshot.limitations, ...factLimitations];
 
   const repositoryName = path.basename(snapshot.root);
-  const complete = snapshot.limitations.every(
+  const complete = limitations.every(
     (limitation) => !limitation.affectsCompleteness,
   );
+  const packageManagers = new Set<string>();
+  for (const manifest of facts.manifests) {
+    if (manifest.declaredPackageManager !== undefined) {
+      packageManagers.add(manifest.declaredPackageManager);
+    }
+  }
+  for (const lockfile of facts.lockfiles) {
+    packageManagers.add(lockfile.packageManager);
+  }
 
   return {
     schemaVersion: "1",
@@ -48,13 +66,15 @@ export async function scanRepository(
       gitRepository: await isGitRepository(snapshot.root),
     },
     profile: {
-      ecosystems: [],
+      ecosystems: facts.ecosystems,
+      packageManagers: [...packageManagers].sort(),
+      workspace: facts.workspace,
       fileCount: snapshot.files.length,
       totalBytes: snapshot.totalBytes,
     },
-    findings: [],
-    scores: createEmptyScore(),
-    limitations: snapshot.limitations,
+    findings,
+    scores: calculateScore(findings),
+    limitations,
     durationMs: Math.round(performance.now() - startedAt),
   };
 }

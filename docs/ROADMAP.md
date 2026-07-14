@@ -2,6 +2,8 @@
 
 ## Phase 0 — Architecture lock
 
+Status: complete.
+
 Deliverables:
 
 - product and non-goal contract;
@@ -19,6 +21,8 @@ Exit criteria:
 - version 0.1 scope fits one npm package.
 
 ## Phase 1 — Walking skeleton
+
+Status: complete.
 
 Deliverables:
 
@@ -40,6 +44,8 @@ Exit criteria:
 
 ## Phase 2 — Evidence vertical slice
 
+Status: complete.
+
 Deliverables:
 
 - Node/package-manager detection;
@@ -59,6 +65,8 @@ Exit criteria:
 - JSON output passes its shipped schema.
 
 ## Phase 3 — Version 0.1 rule set
+
+Status: next.
 
 Deliverables:
 

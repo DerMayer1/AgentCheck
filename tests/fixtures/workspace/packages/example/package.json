@@ -1,0 +1,8 @@
+{
+  "name": "@fixture/example",
+  "private": true,
+  "scripts": {
+    "test": "vitest run",
+    "build": "tsc"
+  }
+}

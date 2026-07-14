@@ -34,16 +34,18 @@ describe("scanRepository", () => {
         gitRepository: true,
       },
       profile: {
-        ecosystems: [],
+        ecosystems: ["node"],
+        packageManagers: [],
+        workspace: false,
         fileCount: 1,
         totalBytes: 3,
       },
-      findings: [],
       scores: {
-        overall: null,
+        overall: 0,
       },
       limitations: [],
     });
+    expect(result.findings).toHaveLength(6);
     expect(result.scores.categories).toHaveLength(5);
   });
 });
