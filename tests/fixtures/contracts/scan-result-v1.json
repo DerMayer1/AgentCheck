@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1",
+  "toolVersion": "0.1.0",
+  "complete": true,
+  "repository": {
+    "name": "consumer-fixture",
+    "root": "/repository",
+    "gitRepository": true
+  },
+  "profile": {
+    "ecosystems": ["node", "typescript"],
+    "packageManagers": ["npm"],
+    "workspace": false,
+    "fileCount": 3,
+    "totalBytes": 128
+  },
+  "findings": [],
+  "scores": {
+    "overall": null,
+    "categories": []
+  },
+  "limitations": [],
+  "durationMs": 12
+}

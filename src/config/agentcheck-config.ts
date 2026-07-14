@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
 import { ConfigError } from "../domain/errors.js";
@@ -22,6 +22,9 @@ export interface AgentCheckConfig {
 }
 
 const CONFIG_FILE = ".agentcheck.json";
+const MAX_CONFIG_BYTES = 262_144;
+const MAX_IGNORE_PATTERNS = 1_000;
+const MAX_IGNORE_PATTERN_LENGTH = 256;
 const RULE_IDS = new Set(ALL_RULES.map((rule) => rule.id));
 const RULE_LEVELS = new Set(["off", "warn", "error"]);
 const SEVERITIES = new Set(["critical", "high", "medium", "low"]);
@@ -46,8 +49,10 @@ function parseConfig(value: unknown): AgentCheckConfig {
   rejectUnknownKeys(root, new Set(["ignore", "rules", "limits", "gates"]), CONFIG_FILE);
 
   const ignoreValue = root.ignore ?? [];
-  if (!Array.isArray(ignoreValue) || ignoreValue.some((item) => typeof item !== "string" || item.length === 0)) {
-    throw new ConfigError("ignore must be an array of non-empty glob strings.");
+  if (!Array.isArray(ignoreValue) || ignoreValue.length > MAX_IGNORE_PATTERNS
+    || ignoreValue.some((item) => typeof item !== "string" || item.length === 0
+      || item.length > MAX_IGNORE_PATTERN_LENGTH || /[\u0000-\u001f]/.test(item))) {
+    throw new ConfigError(`ignore must contain at most ${MAX_IGNORE_PATTERNS} glob strings of 1-${MAX_IGNORE_PATTERN_LENGTH} characters.`);
   }
 
   const ruleValues = objectValue(root.rules ?? {}, "rules");
@@ -100,7 +105,14 @@ export async function loadAgentCheckConfig(targetPath: string): Promise<AgentChe
   const configPath = path.join(root, CONFIG_FILE);
   let source: string;
   try {
+    const metadata = await stat(configPath);
+    if (metadata.size > MAX_CONFIG_BYTES) {
+      throw new ConfigError(`${CONFIG_FILE} exceeds the ${MAX_CONFIG_BYTES}-byte safety limit.`);
+    }
     source = await readFile(configPath, "utf8");
+    if (Buffer.byteLength(source, "utf8") > MAX_CONFIG_BYTES) {
+      throw new ConfigError(`${CONFIG_FILE} exceeds the ${MAX_CONFIG_BYTES}-byte safety limit.`);
+    }
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return parseConfig({});
     throw new ConfigError(`Cannot read ${CONFIG_FILE}: ${error instanceof Error ? error.message : String(error)}`);

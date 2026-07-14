@@ -24,4 +24,21 @@ describe("scan result JSON schema", () => {
 
     expect(validate(result), JSON.stringify(validate.errors, null, 2)).toBe(true);
   });
+
+  it("continues to accept the frozen v1 consumer contract", async () => {
+    const schema = JSON.parse(
+      await readFile(path.join(root, "schemas/scan-result-v1.schema.json"), "utf8"),
+    ) as { $id: string; required: string[] };
+    const frozen = JSON.parse(
+      await readFile(path.join(root, "tests/fixtures/contracts/scan-result-v1.json"), "utf8"),
+    ) as unknown;
+    const validate = new Ajv({ allErrors: true }).compile(schema);
+
+    expect(schema.$id).toBe("https://agentcheck.dev/schema/scan-result-v1.json");
+    expect(schema.required).toEqual([
+      "schemaVersion", "toolVersion", "complete", "repository", "profile",
+      "findings", "scores", "limitations", "durationMs",
+    ]);
+    expect(validate(frozen), JSON.stringify(validate.errors, null, 2)).toBe(true);
+  });
 });

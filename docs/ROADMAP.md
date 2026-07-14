@@ -86,7 +86,7 @@ Exit criteria:
 
 ## Phase 4 — Release hardening
 
-Status: next.
+Status: complete.
 
 Deliverables:
 

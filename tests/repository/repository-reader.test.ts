@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -68,5 +68,43 @@ describe("readRepository", () => {
     await expect(readRepository(file)).rejects.toMatchObject({
       code: "REPOSITORY_ACCESS_ERROR",
     });
+  });
+
+  it("does not follow a symlink that escapes the repository", async () => {
+    const root = await createRepository();
+    const outside = await createRepository();
+    await writeFile(path.join(outside, "secret.txt"), "outside");
+    await symlink(outside, path.join(root, "external"), process.platform === "win32" ? "junction" : "dir");
+
+    const snapshot = await readRepository(root);
+
+    expect(snapshot.files).toEqual([]);
+    expect(snapshot.limitations).toContainEqual({
+      code: "SYMLINK_SKIPPED",
+      message: "Symbolic links are not followed during static scans.",
+      path: "external",
+      affectsCompleteness: false,
+    });
+  });
+
+  it("halts before exceeding the total-byte limit", async () => {
+    const root = await createRepository();
+    await writeFile(path.join(root, "a.txt"), "12345");
+    await writeFile(path.join(root, "b.txt"), "67890");
+
+    const snapshot = await readRepository(root, { ...DEFAULT_TRAVERSAL_LIMITS, maxTotalBytes: 7 });
+
+    expect(snapshot.totalBytes).toBe(5);
+    expect(snapshot.files.map((file) => file.path)).toEqual(["a.txt"]);
+    expect(snapshot.limitations).toContainEqual(expect.objectContaining({ code: "MAX_TOTAL_BYTES_EXCEEDED" }));
+  });
+
+  it("records oversized files without making their contents readable", async () => {
+    const root = await createRepository();
+    await writeFile(path.join(root, "large.txt"), "12345");
+
+    const snapshot = await readRepository(root, { ...DEFAULT_TRAVERSAL_LIMITS, maxFileBytes: 4 });
+
+    expect(snapshot.files).toEqual([{ path: "large.txt", size: 5, contentReadable: false }]);
   });
 });

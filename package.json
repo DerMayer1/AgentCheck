@@ -1,7 +1,14 @@
 {
   "name": "agentcheck",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Evidence-first repository readiness checks for AI coding agents.",
+  "keywords": ["ai", "agents", "cli", "repository", "readiness"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DerMayer1/AgentCheck.git"
+  },
+  "homepage": "https://github.com/DerMayer1/AgentCheck#readme",
+  "bugs": "https://github.com/DerMayer1/AgentCheck/issues",
   "type": "module",
   "bin": {
     "agentcheck": "./dist/cli/main.js"
@@ -13,15 +20,22 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "benchmark": "node scripts/benchmark.mjs",
     "dev": "tsx src/cli/main.ts",
+    "smoke:package": "node scripts/smoke-package.mjs",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "verify": "npm run typecheck && npm run test && npm run build"
+    "verify": "npm run typecheck && npm run test && npm run build",
+    "verify:release-tag": "node scripts/verify-release-tag.mjs"
   },
   "engines": {
     "node": ">=22.12"
   },
   "packageManager": "npm@10.9.4",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "license": "MIT",
   "dependencies": {
     "commander": "^15.0.0",

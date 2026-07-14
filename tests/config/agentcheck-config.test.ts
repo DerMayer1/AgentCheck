@@ -34,4 +34,12 @@ describe(".agentcheck.json", () => {
     expect(result.findings.find((finding) => finding.ruleId === "AC-CTX-001")?.status).toBe("skip");
     expect(result.findings.find((finding) => finding.ruleId === "AC-CTX-002")?.status).toBe("warn");
   });
+
+  it("rejects oversized configuration before parsing", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "agentcheck-large-config-"));
+    temporaryDirectories.push(root);
+    await writeFile(path.join(root, ".agentcheck.json"), " ".repeat(262_145));
+
+    await expect(loadAgentCheckConfig(root)).rejects.toMatchObject({ code: "CONFIG_ERROR" });
+  });
 });
