@@ -217,6 +217,7 @@ interface Finding {
 interface ScanResult {
   schemaVersion: "1";
   toolVersion: string;
+  complete: boolean;
   repository: RepositoryIdentity;
   profile: RepositoryProfile;
   findings: Finding[];

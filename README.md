@@ -36,9 +36,19 @@ agentcheck scan --ci --min-score 70
 
 The first release targets Node.js and TypeScript repositories. Other ecosystems are extensions, not MVP requirements.
 
+## Development
+
+```text
+npm install
+npm run verify
+npm run dev -- scan .
+```
+
+`npm run verify` is the canonical local validation command and runs type checking, tests, and the production build.
+
 ## Status
 
-Architecture definition. No runtime has been implemented yet.
+Phase 1 walking skeleton. The CLI can traverse a repository safely and emit terminal or JSON metadata. Readiness detectors and rules are the next implementation phase.
 
 See:
 
