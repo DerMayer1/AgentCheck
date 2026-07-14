@@ -1,6 +1,7 @@
 import { access } from "node:fs/promises";
 import path from "node:path";
 
+import { loadAgentCheckConfig, type AgentCheckConfig } from "../config/agentcheck-config.js";
 import { detectFacts } from "../detectors/detect-facts.js";
 import type { ScanResult } from "../domain/types.js";
 import {
@@ -14,6 +15,7 @@ import { calculateScore } from "../scoring/empty-score.js";
 export interface ScanRepositoryOptions {
   toolVersion: string;
   limits?: TraversalLimits;
+  config?: AgentCheckConfig;
 }
 
 async function isGitRepository(root: string): Promise<boolean> {
@@ -30,12 +32,14 @@ export async function scanRepository(
   options: ScanRepositoryOptions,
 ): Promise<ScanResult> {
   const startedAt = performance.now();
+  const config = options.config ?? await loadAgentCheckConfig(targetPath);
   const snapshot = await readRepository(
     targetPath,
-    options.limits ?? DEFAULT_TRAVERSAL_LIMITS,
+    options.limits ?? config.limits ?? DEFAULT_TRAVERSAL_LIMITS,
+    config.ignore,
   );
   const facts = await detectFacts(snapshot);
-  const findings = evaluateRules(facts);
+  const findings = evaluateRules(facts, config.rules);
   const factLimitations = facts.limitations.map((limitation) => ({
     ...limitation,
     affectsCompleteness: true,

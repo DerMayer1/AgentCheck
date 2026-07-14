@@ -19,3 +19,4 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run verify
+      - run: node dist/cli/main.js scan . --ci --min-score 90 --fail-on high --fail-on-incomplete

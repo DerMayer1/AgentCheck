@@ -7,6 +7,8 @@ export interface RuleDefinition {
   title: string;
   severity: Severity;
   maxPoints: number;
+  description?: string;
+  remediation?: string;
   evaluate: (facts: RepositoryFacts) => Finding;
 }
 

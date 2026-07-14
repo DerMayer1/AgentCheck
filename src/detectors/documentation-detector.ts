@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import type { CommandFact } from "../domain/facts.js";
+import type { CommandFact, LocatedFact, PathReferenceFact } from "../domain/facts.js";
 import type { RepositorySnapshot } from "../domain/types.js";
 import type { TextFileStore } from "../repository/text-file-store.js";
 import { parseCommand } from "./command-parser.js";
@@ -20,12 +20,20 @@ function isDocumentation(repositoryPath: string): boolean {
   );
 }
 
+function isInstructionDocument(repositoryPath: string): boolean {
+  const basename = path.posix.basename(repositoryPath);
+  return basename === "AGENTS.md" || basename === "CLAUDE.md"
+    || (!repositoryPath.includes("/") && (basename === "README.md" || basename === "CONTRIBUTING.md"));
+}
+
 export async function detectDocumentation(
   snapshot: RepositorySnapshot,
   textFiles: TextFileStore,
 ): Promise<{
   files: string[];
   commands: CommandFact[];
+  pathReferences: PathReferenceFact[];
+  unsafeInstructions: LocatedFact[];
   limitations: Array<{ code: string; message: string; path?: string }>;
 }> {
   const files = snapshot.files
@@ -33,6 +41,8 @@ export async function detectDocumentation(
     .filter(isDocumentation)
     .sort();
   const commands: CommandFact[] = [];
+  const pathReferences: PathReferenceFact[] = [];
+  const unsafeInstructions: LocatedFact[] = [];
   const limitations: Array<{ code: string; message: string; path?: string }> = [];
 
   for (const file of files) {
@@ -51,8 +61,31 @@ export async function detectDocumentation(
       if (parsed !== undefined) {
         commands.push(parsed);
       }
+
+      const unsafePattern = /(?:dangerously[- ]skip|skip permissions|bypass (?:all )?(?:confirmations|approvals)|approve all|unrestricted permissions)/i;
+      if (isInstructionDocument(file) && unsafePattern.test(line)) {
+        unsafeInstructions.push({ path: file, line: index + 1, value: line.trim() });
+      }
+
+      for (const match of line.matchAll(/`((?:src|docs|\.github)\/[A-Za-z0-9_./-]+)`/g)) {
+        const reference = match[1];
+        if (reference === undefined) {
+          continue;
+        }
+        const normalized = reference.replace(/\/$/, "");
+        const exists = snapshot.files.some(
+          (candidate) =>
+            candidate.path === normalized || candidate.path.startsWith(`${normalized}/`),
+        );
+        pathReferences.push({
+          path: file,
+          line: index + 1,
+          value: normalized,
+          exists,
+        });
+      }
     }
   }
 
-  return { files, commands, limitations };
+  return { files, commands, pathReferences, unsafeInstructions, limitations };
 }

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentcheck.dev/schemas/config-v1.schema.json",
+  "title": "AgentCheck configuration v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ignore": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "rules": {
+      "type": "object",
+      "propertyNames": { "pattern": "^AC-(CTX|VER|ENV|SAFE|INT)-[0-9]{3}$" },
+      "additionalProperties": { "enum": ["off", "warn", "error"] }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxDepth": { "type": "integer", "minimum": 1 },
+        "maxFiles": { "type": "integer", "minimum": 1 },
+        "maxFileBytes": { "type": "integer", "minimum": 1 },
+        "maxTotalBytes": { "type": "integer", "minimum": 1 },
+        "timeoutMs": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "minScore": { "type": "number", "minimum": 0, "maximum": 100 },
+        "failOn": { "enum": ["critical", "high", "medium", "low"] },
+        "failOnIncomplete": { "type": "boolean" }
+      }
+    }
+  }
+}

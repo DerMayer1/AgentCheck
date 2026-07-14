@@ -45,6 +45,7 @@ function accessMessage(error: unknown): string {
 export async function readRepository(
   targetPath: string,
   limits: TraversalLimits = DEFAULT_TRAVERSAL_LIMITS,
+  ignorePatterns: readonly string[] = [],
 ): Promise<RepositorySnapshot> {
   let root: string;
 
@@ -70,6 +71,18 @@ export async function readRepository(
   const limitations: AnalysisLimitation[] = [];
   let totalBytes = 0;
   let halted = false;
+
+  const ignored = (repositoryPath: string): boolean => ignorePatterns.some((pattern) => {
+    const normalized = pattern.replace(/^\.\//, "").replace(/\\/g, "/").replace(/\/$/, "/**");
+    const expression = normalized
+      .replace(/[.+^${}()|[\]\\]/g, "\\$&")
+      .replace(/\*\*/g, "\u0000")
+      .replace(/\*/g, "[^/]*")
+      .replace(/\?/g, "[^/]")
+      .replace(/\u0000/g, ".*");
+    const prefix = normalized.includes("/") ? "^" : "(^|.*/)";
+    return new RegExp(`${prefix}${expression}(/.*)?$`).test(repositoryPath);
+  });
 
   const addCompletenessLimit = (
     code: string,
@@ -134,6 +147,10 @@ export async function readRepository(
 
       const absoluteEntry = path.join(directory, entry.name);
       const relativeEntry = toRepositoryPath(path.relative(root, absoluteEntry));
+
+      if (ignored(relativeEntry)) {
+        continue;
+      }
 
       if (entry.isSymbolicLink()) {
         limitations.push({

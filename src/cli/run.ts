@@ -2,9 +2,12 @@ import { Command, CommanderError, InvalidArgumentError } from "commander";
 
 import packageJson from "../../package.json" with { type: "json" };
 import { scanRepository } from "../application/scan-repository.js";
-import { AgentCheckError } from "../domain/errors.js";
+import { loadAgentCheckConfig } from "../config/agentcheck-config.js";
+import { AgentCheckError, ConfigError } from "../domain/errors.js";
+import type { Severity } from "../domain/types.js";
 import { renderJson } from "../reporters/json-reporter.js";
 import { renderTerminal } from "../reporters/terminal-reporter.js";
+import { ALL_RULES } from "../rules/evaluate-rules.js";
 import { EXIT_CODES } from "./exit-codes.js";
 
 interface CliIo {
@@ -16,7 +19,13 @@ interface ScanCommandOptions {
   format: string;
   ci: boolean;
   minScore?: number;
+  failOn?: Exclude<Severity, "info">;
+  failOnIncomplete?: boolean;
 }
+
+const SEVERITY_ORDER: Record<Severity, number> = {
+  critical: 4, high: 3, medium: 2, low: 1, info: 0,
+};
 
 function parseScore(value: string): number {
   const score = Number(value);
@@ -25,6 +34,13 @@ function parseScore(value: string): number {
   }
 
   return score;
+}
+
+function parseSeverity(value: string): Exclude<Severity, "info"> {
+  if (value !== "critical" && value !== "high" && value !== "medium" && value !== "low") {
+    throw new InvalidArgumentError("severity must be critical, high, medium, or low");
+  }
+  return value;
 }
 
 function writeLine(writer: (value: string) => void, value: string): void {
@@ -59,23 +75,29 @@ export async function runCli(
     .option("--format <format>", "terminal or json", "terminal")
     .option("--ci", "enable CI gate behavior", false)
     .option("--min-score <score>", "minimum accepted overall score", parseScore)
+    .option("--fail-on <severity>", "fail when a finding reaches this severity", parseSeverity)
+    .option("--fail-on-incomplete", "fail when the analysis is incomplete")
     .action(async (targetPath: string, options: ScanCommandOptions) => {
       if (options.format !== "terminal" && options.format !== "json") {
         throw new InvalidArgumentError("format must be terminal or json");
       }
 
+      const config = await loadAgentCheckConfig(targetPath);
       const result = await scanRepository(targetPath, {
         toolVersion: packageJson.version,
+        config,
       });
 
       io.stdout(options.format === "json" ? renderJson(result) : renderTerminal(result));
 
-      if (!result.complete) {
+      const failOnIncomplete = options.failOnIncomplete ?? config.gates.failOnIncomplete ?? false;
+      if (!result.complete && failOnIncomplete) {
         exitCode = EXIT_CODES.INCOMPLETE_ANALYSIS;
         return;
       }
 
-      if (options.minScore !== undefined) {
+      const minScore = options.minScore ?? config.gates.minScore;
+      if (minScore !== undefined) {
         if (result.scores.overall === null) {
           writeLine(
             io.stderr,
@@ -85,10 +107,45 @@ export async function runCli(
           return;
         }
 
-        if (result.scores.overall < options.minScore) {
+        if (result.scores.overall < minScore) {
           exitCode = EXIT_CODES.POLICY_GATE_FAILED;
         }
       }
+
+      const failOn = options.failOn ?? config.gates.failOn;
+      if (failOn !== undefined && result.findings.some((finding) =>
+        (finding.status === "fail" || finding.status === "error")
+        && SEVERITY_ORDER[finding.severity] >= SEVERITY_ORDER[failOn])) {
+        exitCode = EXIT_CODES.SEVERITY_GATE_FAILED;
+      }
+    });
+
+  program
+    .command("rules")
+    .description("List the installed deterministic rules")
+    .action(() => {
+      const lines = ALL_RULES.map((rule) =>
+        `${rule.id}\t${rule.severity}\t${rule.category}\t${rule.title}`,
+      );
+      writeLine(io.stdout, ["RULE\tSEVERITY\tCATEGORY\tTITLE", ...lines].join("\n"));
+    });
+
+  program
+    .command("explain")
+    .description("Explain one installed rule")
+    .argument("<rule-id>", "rule identifier, for example AC-CTX-001")
+    .action((ruleId: string) => {
+      const rule = ALL_RULES.find((candidate) => candidate.id === ruleId.toUpperCase());
+      if (rule === undefined) throw new InvalidArgumentError(`unknown rule: ${ruleId}`);
+      const lines = [
+        `${rule.id}: ${rule.title}`,
+        `Category: ${rule.category}`,
+        `Severity: ${rule.severity}`,
+        `Points: ${rule.maxPoints}`,
+        `Check: ${rule.description ?? "Deterministic repository evidence check."}`,
+        `Remediation: ${rule.remediation ?? "Address the evidence reported by agentcheck scan."}`,
+      ];
+      writeLine(io.stdout, lines.join("\n"));
     });
 
   try {
@@ -105,6 +162,11 @@ export async function runCli(
 
     if (error instanceof CommanderError) {
       return error.exitCode === 0 ? EXIT_CODES.SUCCESS : EXIT_CODES.INVALID_USAGE;
+    }
+
+    if (error instanceof ConfigError) {
+      writeLine(io.stderr, `Error: ${error.message}`);
+      return EXIT_CODES.INVALID_USAGE;
     }
 
     if (error instanceof AgentCheckError) {

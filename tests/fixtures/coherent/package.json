@@ -2,6 +2,7 @@
   "name": "coherent-fixture",
   "private": true,
   "packageManager": "npm@10.9.4",
+  "engines": { "node": ">=22.12" },
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit",

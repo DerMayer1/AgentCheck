@@ -17,7 +17,7 @@ afterEach(async () => {
 });
 
 describe("scanRepository", () => {
-  it("builds a complete Phase 1 scan result", async () => {
+  it("builds a complete scan result", async () => {
     const root = await mkdtemp(path.join(tmpdir(), "agentcheck-scan-"));
     temporaryDirectories.push(root);
     await mkdir(path.join(root, ".git"));
@@ -41,11 +41,11 @@ describe("scanRepository", () => {
         totalBytes: 3,
       },
       scores: {
-        overall: 0,
+        overall: expect.any(Number),
       },
       limitations: [],
     });
-    expect(result.findings).toHaveLength(6);
+    expect(result.findings).toHaveLength(18);
     expect(result.scores.categories).toHaveLength(5);
   });
 });

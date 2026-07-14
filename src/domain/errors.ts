@@ -13,3 +13,9 @@ export class RepositoryAccessError extends AgentCheckError {
     super(message, "REPOSITORY_ACCESS_ERROR");
   }
 }
+
+export class ConfigError extends AgentCheckError {
+  public constructor(message: string) {
+    super(message, "CONFIG_ERROR");
+  }
+}

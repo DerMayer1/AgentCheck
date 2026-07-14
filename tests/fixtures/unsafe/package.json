@@ -1,0 +1,12 @@
+{
+  "name": "unsafe-fixture",
+  "private": true,
+  "packageManager": "npm@10.9.4",
+  "scripts": {
+    "test": "vitest run || true",
+    "typecheck": "tsc --noEmit",
+    "verify": "npm run test && npm run deploy",
+    "deploy": "deploy-production",
+    "reset": "rm -rf data"
+  }
+}

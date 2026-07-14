@@ -62,7 +62,7 @@ describe("runCli", () => {
     expect(stderr).toContain("format must be terminal or json");
   });
 
-  it("reports that score gates are unavailable before rules exist", async () => {
+  it("fails a score gate for an unprepared repository", async () => {
     const root = await mkdtemp(path.join(tmpdir(), "agentcheck-gate-"));
     temporaryDirectories.push(root);
     let stderr = "";
@@ -74,8 +74,8 @@ describe("runCli", () => {
       },
     });
 
-    expect(exitCode).toBe(EXIT_CODES.INCOMPLETE_ANALYSIS);
-    expect(stderr).toContain("cannot apply --min-score");
+    expect(exitCode).toBe(EXIT_CODES.POLICY_GATE_FAILED);
+    expect(stderr).toBe("");
   });
 
   it("passes and fails score gates from real findings", async () => {
@@ -90,5 +90,34 @@ describe("runCli", () => {
 
     expect(passingCode).toBe(EXIT_CODES.SUCCESS);
     expect(failingCode).toBe(EXIT_CODES.POLICY_GATE_FAILED);
+  });
+
+  it("lists and explains installed rules", async () => {
+    let rules = "";
+    let explanation = "";
+    expect(await runCli(["rules"], { stdout: (value) => { rules += value; }, stderr: () => undefined })).toBe(0);
+    expect(await runCli(["explain", "ac-ctx-001"], { stdout: (value) => { explanation += value; }, stderr: () => undefined })).toBe(0);
+    expect(rules).toContain("AC-CTX-001");
+    expect(rules.trim().split("\n")).toHaveLength(19);
+    expect(explanation).toContain("Repository overview is actionable");
+    expect(explanation).toContain("Remediation:");
+  });
+
+  it("uses a distinct exit code for severity gates", async () => {
+    const code = await runCli(
+      ["scan", path.join(fixtureRoot, "unsafe"), "--fail-on", "high"],
+      { stdout: () => undefined, stderr: () => undefined },
+    );
+    expect(code).toBe(EXIT_CODES.SEVERITY_GATE_FAILED);
+  });
+
+  it("rejects invalid repository configuration", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "agentcheck-invalid-config-"));
+    temporaryDirectories.push(root);
+    await writeFile(path.join(root, ".agentcheck.json"), '{"rules":{"AC-NOT-999":"off"}}');
+    let stderr = "";
+    const code = await runCli(["scan", root], { stdout: () => undefined, stderr: (value) => { stderr += value; } });
+    expect(code).toBe(EXIT_CODES.INVALID_USAGE);
+    expect(stderr).toContain("unknown rule");
   });
 });

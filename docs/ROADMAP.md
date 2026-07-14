@@ -66,7 +66,7 @@ Exit criteria:
 
 ## Phase 3 — Version 0.1 rule set
 
-Status: next.
+Status: complete.
 
 Deliverables:
 
@@ -85,6 +85,8 @@ Exit criteria:
 - the tool performs no target-repository writes or code execution.
 
 ## Phase 4 — Release hardening
+
+Status: next.
 
 Deliverables:
 

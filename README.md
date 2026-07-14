@@ -31,8 +31,21 @@ Machine-readable operation is part of the core product:
 
 ```text
 agentcheck scan --format json
-agentcheck scan --ci --min-score 70
+agentcheck scan --ci --min-score 70 --fail-on high --fail-on-incomplete
 ```
+
+Repository policy can be stored in `.agentcheck.json`:
+
+```json
+{
+  "ignore": ["generated/**"],
+  "rules": { "AC-CTX-002": "warn" },
+  "limits": { "maxFiles": 25000 },
+  "gates": { "minScore": 80, "failOn": "high", "failOnIncomplete": true }
+}
+```
+
+Rule levels are `off`, `warn`, and `error`. CLI gate options override configured gates. Exit code 1 means a score gate failed, 3 means an explicitly gated incomplete analysis, and 5 means a severity gate failed.
 
 The first release targets Node.js and TypeScript repositories. Other ecosystems are extensions, not MVP requirements.
 
@@ -48,7 +61,7 @@ npm run dev -- scan .
 
 ## Status
 
-Phase 2 evidence slice. The CLI detects Node.js repositories, package managers, workspaces, package scripts, documented commands, and GitHub Actions commands. Six deterministic rules produce evidence-backed findings and a real score.
+Phase 3 complete. The version 0.1 surface now evaluates 18 deterministic rules, validates `.agentcheck.json`, supports score/severity/completeness gates, explains its rule catalog, and locks terminal and JSON contracts with golden tests. Scans remain local, static, read-only, and network-free.
 
 See:
 

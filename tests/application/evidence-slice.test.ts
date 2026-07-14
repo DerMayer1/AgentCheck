@@ -16,7 +16,7 @@ function finding(result: Awaited<ReturnType<typeof scanRepository>>, ruleId: str
   return value;
 }
 
-describe("Phase 2 evidence slice", () => {
+describe("repository evidence rules", () => {
   it("scores a coherent repository from manifest, documentation, and CI evidence", async () => {
     const result = await scanRepository(path.join(fixtures, "coherent"), {
       toolVersion: "test",
@@ -29,12 +29,14 @@ describe("Phase 2 evidence slice", () => {
       workspace: false,
     });
     expect(result.scores.overall).toBe(100);
-    expect(result.findings).toHaveLength(6);
-    expect(result.findings.every((item) => item.status === "pass")).toBe(true);
+    expect(result.findings).toHaveLength(18);
+    expect(result.findings.every((item) => item.status === "pass" || item.status === "skip")).toBe(true);
     expect(finding(result, "AC-VER-004")?.evidence[0]).toMatchObject({
       path: ".github/workflows/ci.yml",
       line: 8,
     });
+    expect(finding(result, "AC-CTX-002")?.status).toBe("pass");
+    expect(finding(result, "AC-ENV-002")?.status).toBe("pass");
   });
 
   it("finds a documented script that is missing from package.json", async () => {

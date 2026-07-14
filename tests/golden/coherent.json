@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "1",
+  "toolVersion": "0.0.0",
+  "complete": true,
+  "repository": "coherent",
+  "fileCount": 7,
+  "overall": 100,
+  "findings": [
+    "AC-ENV-001:pass",
+    "AC-ENV-003:pass",
+    "AC-VER-001:pass",
+    "AC-VER-003:pass",
+    "AC-VER-004:pass",
+    "AC-INT-001:pass",
+    "AC-CTX-001:pass",
+    "AC-CTX-002:pass",
+    "AC-VER-002:pass",
+    "AC-VER-005:pass",
+    "AC-VER-006:pass",
+    "AC-ENV-002:pass",
+    "AC-ENV-004:skip",
+    "AC-ENV-005:pass",
+    "AC-SAFE-001:skip",
+    "AC-SAFE-002:skip",
+    "AC-SAFE-004:pass",
+    "AC-INT-002:skip"
+  ]
+}

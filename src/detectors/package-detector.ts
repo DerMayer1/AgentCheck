@@ -12,7 +12,25 @@ interface PackageJsonShape {
   name?: unknown;
   scripts?: unknown;
   packageManager?: unknown;
+  engines?: unknown;
+  volta?: unknown;
   workspaces?: unknown;
+}
+
+function parseNodeConstraint(parsed: PackageJsonShape): string | undefined {
+  if (typeof parsed.engines === "object" && parsed.engines !== null && "node" in parsed.engines) {
+    const node = (parsed.engines as { node?: unknown }).node;
+    if (typeof node === "string") {
+      return node;
+    }
+  }
+  if (typeof parsed.volta === "object" && parsed.volta !== null && "node" in parsed.volta) {
+    const node = (parsed.volta as { node?: unknown }).node;
+    if (typeof node === "string") {
+      return node;
+    }
+  }
+  return undefined;
 }
 
 const LOCKFILES: Readonly<Record<string, PackageManager>> = {
@@ -96,12 +114,14 @@ export async function detectPackages(
     try {
       const parsed = JSON.parse(result.content) as PackageJsonShape;
       const declaredPackageManager = parsePackageManager(parsed.packageManager);
+      const nodeVersionConstraint = parseNodeConstraint(parsed);
       manifests.push({
         path: manifestPath,
         directory: directoryOf(manifestPath),
         ...(typeof parsed.name === "string" ? { name: parsed.name } : {}),
         scripts: parseScripts(parsed.scripts),
         ...(declaredPackageManager === undefined ? {} : { declaredPackageManager }),
+        ...(nodeVersionConstraint === undefined ? {} : { nodeVersionConstraint }),
         workspacePatterns: parseWorkspaces(parsed.workspaces),
       });
     } catch (error) {

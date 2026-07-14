@@ -2,7 +2,7 @@
 
 This catalog defines the initial rule-design surface. A rule only enters the runtime after its fixtures, evidence format, applicability behavior, and scoring points are specified.
 
-Runtime status: AC-ENV-001, AC-ENV-003, AC-VER-001, AC-VER-003, AC-VER-004, and AC-INT-001 are implemented in the Phase 2 evidence slice.
+Runtime status: the version 0.1 cut contains 18 implemented rules: AC-CTX-001–002, AC-VER-001–006, AC-ENV-001–005, AC-SAFE-001–002 and 004, and AC-INT-001–002. The remaining candidates stay explicitly deferred.
 
 ## Rule result requirements
 
@@ -68,7 +68,7 @@ Every rule must provide:
 
 ## MVP cut line
 
-The catalog contains 23 candidates. Version 0.1 should ship the first 15–18 whose deterministic behavior is strongest. Rule count is not a quality metric.
+The catalog contains 23 candidates. Version 0.1 ships the 18 whose deterministic behavior is strongest. Rule count is not a quality metric.
 
 The most valuable vertical slice is:
 

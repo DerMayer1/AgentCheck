@@ -1,0 +1,18 @@
+AgentCheck 0.0.0
+
+Repository  coherent
+Root        <ROOT>
+Files       7
+Size        761 B
+Git         not detected
+
+AGENT READINESS  100/100
+Verification   100/100
+Environment    100/100
+Safety         100/100
+Context        100/100
+Integrity      100/100
+
+14 passed · 0 findings
+
+Completed in <DURATION>
